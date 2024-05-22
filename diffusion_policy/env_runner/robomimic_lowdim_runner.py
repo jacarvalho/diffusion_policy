@@ -23,6 +23,8 @@ import robomimic.utils.file_utils as FileUtils
 import robomimic.utils.env_utils as EnvUtils
 import robomimic.utils.obs_utils as ObsUtils
 
+from diffusion_policy.utils.torch_timer import TimerCUDA
+
 
 def create_env(env_meta, obs_keys):
     ObsUtils.initialize_obs_modality_mapping_from_dict(
@@ -343,6 +345,13 @@ class RobomimicLowdimRunner(BaseLowdimRunner):
             name = prefix+'mean_score'
             value = np.mean(value)
             log_data[name] = value
+
+        # log policy computation time for 1 environment
+        obs_dict_tmp = obs_dict.copy()
+        obs_dict_tmp['obs'] = obs_dict_tmp['obs'][0][None, ...]
+        with torch.no_grad() and TimerCUDA() as t_policy_call:
+            _ = policy.predict_action(obs_dict_tmp)
+        log_data['predict_action_time'] = t_policy_call.elapsed
 
         return log_data
 

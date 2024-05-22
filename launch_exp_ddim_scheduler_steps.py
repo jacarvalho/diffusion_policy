@@ -5,13 +5,14 @@ from experiment_launcher import Launcher, is_local
 LOCAL = is_local()
 USE_CUDA = True
 
-N_EXPS_IN_PARALLEL = 6
+N_EXPS_IN_PARALLEL = 1
 
 N_CORES = 8
 MEMORY_SINGLE_JOB = 4000
 MEMORY_PER_CORE = N_EXPS_IN_PARALLEL * MEMORY_SINGLE_JOB // N_CORES
 PARTITION = 'amd2,amd'  # 'amd', 'rtx'
-GRES = 'gpu:1' if USE_CUDA else None  # gpu:rtx2080:1, gpu:rtx3080:1
+# GRES = 'gpu:1' if USE_CUDA else None  # gpu:rtx2080:1, gpu:rtx3080:1
+GRES = 'gpu:rtx3090:1' if USE_CUDA else None  # gpu:rtx2080:1, gpu:rtx3080:1
 CONDA_ENV = 'robodiff'  # None
 
 launcher = Launcher(
@@ -37,7 +38,7 @@ launcher = Launcher(
 
 #########################
 # Robomimic LOW-DIM
-checkpoints_robomimic_low_dim_l = [
+checkpoints_robomimic_low_dim_diffusion_policy_cnn_l = [
     # Lift
     f'data_train_eval/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
     f'data_train_eval/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=0400-test_mean_score=1.000.ckpt',
@@ -81,7 +82,7 @@ checkpoints_robomimic_low_dim_l = [
 ]
 
 # Robomimic IMAGE
-checkpoints_robomimic_image_l = [
+checkpoints_robomimic_image_diffusion_policy_cnn_l = [
     # Lift
     f'data_train_eval/experiments/image/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0300-test_mean_score=1.000.ckpt',
     f'data_train_eval/experiments/image/lift_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
@@ -126,7 +127,7 @@ checkpoints_robomimic_image_l = [
 ]
 
 
-checkpoints_l = checkpoints_robomimic_low_dim_l + checkpoints_robomimic_image_l
+checkpoints_l = checkpoints_robomimic_low_dim_diffusion_policy_cnn_l + checkpoints_robomimic_image_diffusion_policy_cnn_l
 
 num_inference_steps_l = [
     50,

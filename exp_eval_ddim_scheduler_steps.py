@@ -26,7 +26,7 @@ from diffusion_policy.workspace.base_workspace import BaseWorkspace
 @single_experiment_yaml
 def experiment(
     checkpoint: str = 'data_train_eval/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
-    num_inference_steps: int = 25,
+    num_inference_steps: int = 10,
 
     device: str = 'cuda:0',
 
