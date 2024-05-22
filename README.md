@@ -64,6 +64,14 @@ To download all files in a subdirectory, use:
 $ wget --recursive --no-parent --no-host-directories --relative --reject="index.html*" https://diffusion-policy.cs.columbia.edu/data/experiments/low_dim/square_ph/diffusion_policy_cnn/
 ```
 
+To download **ALL** the data run:
+```console
+wget --recursive --level inf --no-parent --no-host-directories --relative --reject="index.html*" https://diffusion-policy.cs.columbia.edu/data/
+cd data/training
+unzip \*.zip
+rm *.zip
+```
+
 ## 🛠️ Installation
 ### 🖥️ Simulation
 To reproduce our simulation benchmark results, install our conda environment on a Linux machine with Nvidia GPU. On Ubuntu 20.04 you need to install the following apt packages for mujoco:
