@@ -22,31 +22,32 @@ import wandb
 import json
 from diffusion_policy.workspace.base_workspace import BaseWorkspace
 
+from pathlib import Path
+
 
 @single_experiment_yaml
 def experiment(
-    checkpoint: str = 'data_train_eval/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
+    checkpoint: str = 'data_experiments/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
     num_inference_steps: int = 10,
+
+    base_output_dir: str = 'logs/tmp',
 
     device: str = 'cuda:0',
 
     #######################################
     # MANDATORY
     seed: int = 0,
-    results_dir: str = 'logs',
+    results_dir: str = 'logs/tmp',
 
     #######################################
     **kwargs
 ):
-    # get directory of checkpoint
-    checkpoint_dir = os.path.dirname(checkpoint)
+    # get directory of checkpoint and rename output directory
+    checkpoint_dir = str(Path(checkpoint).parent)
     output_dir = re.sub('/checkpoints', '', checkpoint_dir)
     output_dir = re.sub('experiments', 'evaluations', output_dir)
-    output_dir = os.path.join(output_dir, f'eval-ddim-{num_inference_steps}')
-
-    if os.path.exists(output_dir):
-        click.confirm(f"Output path {output_dir} already exists! Overwrite?", abort=True)
-    pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
+    output_dir = Path(base_output_dir, output_dir, f'eval-ddim-{num_inference_steps}')
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     # load checkpoint
     payload = torch.load(open(checkpoint, 'rb'), pickle_module=dill)
