@@ -24,6 +24,7 @@ import robomimic.utils.env_utils as EnvUtils
 import robomimic.utils.obs_utils as ObsUtils
 
 from diffusion_policy.utils.torch_timer import TimerCUDA
+from diffusion_policy.utils.utils import keep_idx_of_batch
 
 
 def create_env(env_meta, obs_keys):
@@ -348,7 +349,7 @@ class RobomimicLowdimRunner(BaseLowdimRunner):
 
         # log policy computation time for 1 environment
         obs_dict_tmp = obs_dict.copy()
-        obs_dict_tmp['obs'] = obs_dict_tmp['obs'][0][None, ...]
+        keep_idx_of_batch(obs_dict_tmp)
         with torch.no_grad() and TimerCUDA() as t_policy_call:
             _ = policy.predict_action(obs_dict_tmp)
         log_data['predict_action_time'] = t_policy_call.elapsed

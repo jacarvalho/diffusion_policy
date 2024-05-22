@@ -23,6 +23,9 @@ import robomimic.utils.file_utils as FileUtils
 import robomimic.utils.env_utils as EnvUtils
 import robomimic.utils.obs_utils as ObsUtils
 
+from diffusion_policy.utils.torch_timer import TimerCUDA
+from diffusion_policy.utils.utils import keep_idx_of_batch
+
 
 def create_env(env_meta, shape_meta, enable_render=True):
     modality_mapping = collections.defaultdict(list)
@@ -350,6 +353,13 @@ class RobomimicImageRunner(BaseImageRunner):
             name = prefix+'mean_score'
             value = np.mean(value)
             log_data[name] = value
+
+        # log policy computation time for 1 environment
+        obs_dict_tmp = obs_dict.copy()
+        keep_idx_of_batch(obs_dict_tmp)
+        with torch.no_grad() and TimerCUDA() as t_policy_call:
+            _ = policy.predict_action(obs_dict_tmp)
+        log_data['predict_action_time'] = t_policy_call.elapsed
 
         return log_data
 

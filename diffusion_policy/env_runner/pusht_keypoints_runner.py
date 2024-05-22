@@ -16,6 +16,9 @@ from diffusion_policy.gym_util.video_recording_wrapper import VideoRecordingWrap
 from diffusion_policy.policy.base_lowdim_policy import BaseLowdimPolicy
 from diffusion_policy.common.pytorch_util import dict_apply
 from diffusion_policy.env_runner.base_lowdim_runner import BaseLowdimRunner
+from diffusion_policy.utils.torch_timer import TimerCUDA
+from diffusion_policy.utils.utils import keep_idx_of_batch
+
 
 class PushTKeypointsRunner(BaseLowdimRunner):
     def __init__(self,
@@ -269,5 +272,12 @@ class PushTKeypointsRunner(BaseLowdimRunner):
             name = prefix+'mean_score'
             value = np.mean(value)
             log_data[name] = value
+
+        # log policy computation time for 1 environment
+        obs_dict_tmp = obs_dict.copy()
+        keep_idx_of_batch(obs_dict_tmp)
+        with torch.no_grad() and TimerCUDA() as t_policy_call:
+            _ = policy.predict_action(obs_dict_tmp)
+        log_data['predict_action_time'] = t_policy_call.elapsed
 
         return log_data
