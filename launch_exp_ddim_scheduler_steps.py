@@ -131,9 +131,9 @@ checkpoints_robomimic_image_diffusion_policy_cnn_l = [
 
 ]
 
-
-checkpoints_l = checkpoints_robomimic_low_dim_diffusion_policy_cnn_l
 # checkpoints_l = checkpoints_robomimic_low_dim_diffusion_policy_cnn_l + checkpoints_robomimic_image_diffusion_policy_cnn_l
+# checkpoints_l = checkpoints_robomimic_low_dim_diffusion_policy_cnn_l
+checkpoints_l = checkpoints_robomimic_image_diffusion_policy_cnn_l
 
 num_inference_steps_l = [
     50,
