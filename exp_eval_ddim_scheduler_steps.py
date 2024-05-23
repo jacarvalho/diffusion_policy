@@ -27,7 +27,7 @@ from pathlib import Path
 
 @single_experiment_yaml
 def experiment(
-    checkpoint: str = 'data_experiments/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
+    checkpoint: str = 'data_experiments/experiments/low_dim/lift_ph/diffusion_policy_transformer/train_0/checkpoints/epoch=0800-test_mean_score=1.000.ckpt',
     num_inference_steps: int = 10,
 
     base_output_dir: str = 'logs/tmp',

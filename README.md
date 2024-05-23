@@ -1,3 +1,27 @@
+# MODIFIED README
+
+Download **ALL** demonstrations data:
+```console
+mkdir data && cd data
+wget --recursive --level inf --no-parent --no-host-directories --relative --reject="index.html*" https://diffusion-policy.cs.columbia.edu/data/training/
+unzip \*.zip
+rm *.zip
+``` 
+
+Download **ALL** experiments data:
+```console
+mkdir data_experiments && cd data_experiments
+wget --recursive --level inf --no-parent --no-host-directories --relative --reject="index.html*" https://diffusion-policy.cs.columbia.edu/data/experiments/
+unzip \*.zip
+rm *.zip
+``` 
+
+
+
+
+---
+# ORIGINAL README
+
 # Diffusion Policy
 
 [[Project page]](https://diffusion-policy.cs.columbia.edu/)
@@ -62,14 +86,6 @@ To download all files in a subdirectory, use:
 
 ```console
 $ wget --recursive --no-parent --no-host-directories --relative --reject="index.html*" https://diffusion-policy.cs.columbia.edu/data/experiments/low_dim/square_ph/diffusion_policy_cnn/
-```
-
-To download **ALL** the data run:
-```console
-wget --recursive --level inf --no-parent --no-host-directories --relative --reject="index.html*" https://diffusion-policy.cs.columbia.edu/data/
-cd data/training
-unzip \*.zip
-rm *.zip
 ```
 
 ## 🛠️ Installation

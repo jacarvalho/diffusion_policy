@@ -1,4 +1,5 @@
 import datetime
+import glob
 from itertools import product
 
 from experiment_launcher import Launcher, is_local
@@ -9,7 +10,7 @@ USE_CUDA = True
 N_EXPS_IN_PARALLEL = 1
 
 N_CORES = 8
-MEMORY_SINGLE_JOB = 32000
+MEMORY_SINGLE_JOB = 36000
 MEMORY_PER_CORE = N_EXPS_IN_PARALLEL * MEMORY_SINGLE_JOB // N_CORES
 PARTITION = 'amd2,amd'  # 'amd', 'rtx'
 # GRES = 'gpu:1' if USE_CUDA else None  # gpu:rtx2080:1, gpu:rtx3080:1
@@ -42,98 +43,52 @@ launcher = Launcher(
 # Create and launch experiments
 
 #########################
-# Robomimic LOW-DIM
-checkpoints_robomimic_low_dim_diffusion_policy_cnn_l = [
-    # Lift
-    f'data_experiments/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=0400-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/lift_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=0300-test_mean_score=1.000.ckpt',
+# get all checkpoint paths
+# take the best checkpoint and not the latest
+ckpt_paths = glob.glob(f'./data_experiments/**/epoch*.ckpt', recursive=True)
 
-    f'data_experiments/experiments/low_dim/lift_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/lift_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/lift_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
 
-    # Square
-    f'data_experiments/experiments/low_dim/square_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=1750-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/square_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=1600-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/square_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=0750-test_mean_score=1.000.ckpt',
+def get_checkpoints(tags_l):
+    res = []
+    for ckpt in ckpt_paths:
+        for tags in tags_l:
+            flag = 1
+            for tag in tags:
+                if tag not in ckpt:
+                    flag = 0
+                    break
+            if flag:
+                res.append(ckpt)
+    return res
 
-    f'data_experiments/experiments/low_dim/square_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=4600-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/square_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=2650-test_mean_score=0.955.ckpt',
-    f'data_experiments/experiments/low_dim/square_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=1250-test_mean_score=1.000.ckpt',
 
-    # Can
-    f'data_experiments/experiments/low_dim/can_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0350-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/can_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=0750-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/can_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=0300-test_mean_score=1.000.ckpt',
-
-    f'data_experiments/experiments/low_dim/can_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=3200-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/can_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=0550-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/low_dim/can_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=0450-test_mean_score=1.000.ckpt',
-
-    # Transport
-    f'data_experiments/experiments/low_dim/transport_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=2100-test_mean_score=0.955.ckpt',
-    f'data_experiments/experiments/low_dim/transport_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=2350-test_mean_score=0.909.ckpt',
-    f'data_experiments/experiments/low_dim/transport_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=2800-test_mean_score=1.000.ckpt',
-
-    f'data_experiments/experiments/low_dim/transport_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=4100-test_mean_score=0.727.ckpt',
-    f'data_experiments/experiments/low_dim/transport_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=4700-test_mean_score=0.773.ckpt',
-    f'data_experiments/experiments/low_dim/transport_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=3800-test_mean_score=0.773.ckpt',
-
-    # ToolHang
-    f'data_experiments/experiments/low_dim/tool_hang_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0850-test_mean_score=0.818.ckpt',
-    f'data_experiments/experiments/low_dim/tool_hang_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=2000-test_mean_score=0.864.ckpt',
-    f'data_experiments/experiments/low_dim/tool_hang_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=3750-test_mean_score=0.864.ckpt',
+tasks = [
+    'lift_ph',
+    'lift_mh',
+    'can_ph',
+    'can_mh',
+    'square_ph'
+    'square_mh',
+    'transport_ph',
+    'transport_mh',
+    'tool_hang_ph',
 ]
 
-# Robomimic IMAGE
-checkpoints_robomimic_image_diffusion_policy_cnn_l = [
-    # Lift
-    f'data_experiments/experiments/image/lift_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0300-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/lift_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/lift_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
+# Robomimic LOW-DIM - Diffusion Policy Transformer
+checkpoints_robomimic_low_dim_diffusion_policy_transformer_l = get_checkpoints(
+    [(task, 'low_dim', 'diffusion_policy_transformer') for task in tasks]
+)
 
-    f'data_experiments/experiments/image/lift_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/lift_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=0250-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/lift_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=0300-test_mean_score=1.000.ckpt',
+# Robomimic IMAGE - Diffusion Policy Transformer
+checkpoints_robomimic_image_diffusion_policy_transformer_l = get_checkpoints(
+    [(task, 'image', 'diffusion_policy_transformer') for task in tasks]
+)
 
-    # Square
-    f'data_experiments/experiments/image/square_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=1250-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/square_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=2050-test_mean_score=0.955.ckpt',
-    f'data_experiments/experiments/image/square_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=2600-test_mean_score=1.000.ckpt',
 
-    f'data_experiments/experiments/image/square_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=0050-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/square_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=1600-test_mean_score=0.955.ckpt',
-    f'data_experiments/experiments/image/square_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=1950-test_mean_score=1.000.ckpt',
-
-    # Can
-    f'data_experiments/experiments/image/can_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=0350-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/can_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=0400-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/can_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=1150-test_mean_score=1.000.ckpt',
-
-    f'data_experiments/experiments/image/can_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=1200-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/can_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=2550-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/can_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=0600-test_mean_score=1.000.ckpt',
-
-    # Transport
-    f'data_experiments/experiments/image/transport_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=2750-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/transport_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=2050-test_mean_score=0.955.ckpt',
-    f'data_experiments/experiments/image/transport_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=2600-test_mean_score=1.000.ckpt',
-
-    f'data_experiments/experiments/image/transport_mh/diffusion_policy_cnn/train_0/checkpoints/epoch=2850-test_mean_score=0.909.ckpt',
-    f'data_experiments/experiments/image/transport_mh/diffusion_policy_cnn/train_1/checkpoints/epoch=2350-test_mean_score=0.864.ckpt',
-    f'data_experiments/experiments/image/transport_mh/diffusion_policy_cnn/train_2/checkpoints/epoch=2500-test_mean_score=0.864.ckpt',
-
-    # ToolHang
-    f'data_experiments/experiments/image/tool_hang_ph/diffusion_policy_cnn/train_0/checkpoints/epoch=2150-test_mean_score=0.955.ckpt',
-    f'data_experiments/experiments/image/tool_hang_ph/diffusion_policy_cnn/train_1/checkpoints/epoch=2650-test_mean_score=1.000.ckpt',
-    f'data_experiments/experiments/image/tool_hang_ph/diffusion_policy_cnn/train_2/checkpoints/epoch=1250-test_mean_score=0.909.ckpt',
-
+checkpoints_l = [
+    *checkpoints_robomimic_low_dim_diffusion_policy_transformer_l,
+    *checkpoints_robomimic_image_diffusion_policy_transformer_l,
 ]
-
-# checkpoints_l = checkpoints_robomimic_low_dim_diffusion_policy_cnn_l + checkpoints_robomimic_image_diffusion_policy_cnn_l
-# checkpoints_l = checkpoints_robomimic_low_dim_diffusion_policy_cnn_l
-checkpoints_l = checkpoints_robomimic_image_diffusion_policy_cnn_l
 
 num_inference_steps_l = [
     50,
